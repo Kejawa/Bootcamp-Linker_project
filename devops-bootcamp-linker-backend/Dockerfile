@@ -1,4 +1,4 @@
-#--- Build Stage ---
+# Stage 1: Build
 FROM node:20-alpine AS builder
 
 WORKDIR /app
@@ -22,7 +22,7 @@ RUN npx prisma generate
 RUN npm run build
 
 
-#--- Production Stage ---
+# Stage 2: Production
 FROM node:20-alpine AS runner
 
 # Set environment
