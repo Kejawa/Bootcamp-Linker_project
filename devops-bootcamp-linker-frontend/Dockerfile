@@ -1,50 +1,37 @@
-ARG NODE=node:20-alpine
-
-# Stage 1: Build the application
-FROM $NODE AS build
-
-RUN apk update && apk upgrade
+# Install dependencies && Build
+FROM node:20-alpine AS builder
 
 WORKDIR /app
 
-# Copy package.json and package-lock.json
 COPY package*.json ./
 
-# Install dependencies using npm ci for faster, more reliable build
 RUN npm ci
 
-# Copy the rest of the application source code
+# Copy rest of source code
 COPY . .
+
+# Define a build argument for API URL used by frontend
 ARG NEXT_PUBLIC_API_URL
 ENV NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL
-ENV NODE_ENV=production
 
-# Build the application
+# Build the Next.js application for production
 RUN npm run build
 
-# Stage 2: Production image
-FROM $NODE AS production
+# Production runtime
+FROM node:20-alpine AS runner
 
-RUN apk update && apk upgrade
+WORKDIR /app 
 
-WORKDIR /app
+ENV NODE_ENV=production
 
-# Create a non-root user and group
-RUN addgroup --system --gid 1001 nodejs
-RUN adduser --system --uid 1001 nextjs
+RUN addgroup -S appgroup && adduser -S appuser -G appgroup
 
-# Copy the standalone output
-COPY --from=build --chown=nextjs:nodejs /app/.next/standalone ./
-# Copy the public and static folders
-COPY --from=build --chown=nextjs:nodejs /app/.next/static ./.next/static
+COPY --from=builder --chown=appuser:appgroup /app/.next/standalone ./
+COPY --from=builder --chown=appuser:appgroup /app/.next/static ./.next/static 
+COPY --from=builder --chown=appuser:appgroup /app/public ./public 
 
-COPY --from=build --chown=nextjs:nodejs /app/public ./public
+USER appuser
 
-# Set the user
-USER nextjs
-
-# Expose the port the app runs on
 EXPOSE 3000
 
-# Start the application
 CMD ["node", "server.js"]

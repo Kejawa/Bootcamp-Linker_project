@@ -1,1 +1,53 @@
-version: 
+version: '3.9'
+services:
+
+# DB: Postgres
+  postgres-db:
+    image: postgres:15
+    container_name: postgres-db
+    restart: unless-stopped
+    env_file:
+      - ./devops-bootcamp-linker-backend/.env
+    volumes:
+      - pgdata://var/lib/postgresql/data
+    networks:
+      - mynetwork
+    ports:
+      - "5432:5432"  
+
+
+  # Backend
+  backend:
+    image: kejawa/my-backend:latest
+    container_name: backend
+    restart: unless-stopped
+    depends_on:
+      - postgres-db 
+    env_file:
+      - ./devops-bootcamp-linker-backend/.env
+    ports:
+      - "3001:3001" 
+    networks:
+      - mynetwork    
+
+
+  # Frontend
+  frontend:
+    image: kejawa/my-frontend:latest
+    container_name: frontend
+    restart: unless-stopped
+    depends_on:
+      - backend
+    environment:
+      NEXT_PUBLIC_API_URL: http://217.76.61.226:3001/api
+    ports:
+      - "3000:3000"  
+    networks:
+      - mynetwork
+
+networks:
+  mynetwork:
+    driver: bridge
+
+volumes:
+  pgdata:
