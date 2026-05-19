@@ -22,7 +22,7 @@ services:
     container_name: backend
     restart: unless-stopped
     depends_on:
-      - postgres-db 
+      - postgres-db
     env_file:
       - ./devops-bootcamp-linker-backend/.env
     ports:

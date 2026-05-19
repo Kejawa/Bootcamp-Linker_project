@@ -25,9 +25,9 @@ on:
 # GLOBAL VARIABLES
 # -------------------------------------------------
 env:
-    DOCKER_REPO: achebeh
-    IMAGE_NAME: devlink-frontend
-    NEXT_PUBLIC_API_URL: "http://api.devopsbootcamp.online/api"
+    DOCKER_REPO: kejawa
+    IMAGE_NAME: my-frontend:latest
+    NEXT_PUBLIC_API_URL: "http://217.76.61.226:3001/api"
 
 # -------------------------------------------------
 # JOB 1: Notify Slack that pipeline started
