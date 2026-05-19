@@ -16,8 +16,6 @@ on:
     push:
         branches: 
             - main
-        paths:
-            - "devops-bootcamp-linker-frontend/**"    
         paths-ignore:
             - ".github/workflows/**"
             - "**/*.md"
