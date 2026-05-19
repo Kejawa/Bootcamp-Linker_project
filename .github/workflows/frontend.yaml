@@ -16,6 +16,8 @@ on:
     push:
         branches: 
             - main
+        paths:
+            - "devops-bootcamp-linker-frontend/**"    
         paths-ignore:
             - ".github/workflows/**"
             - "**/*.md"
@@ -26,7 +28,7 @@ on:
 # -------------------------------------------------
 env:
     DOCKER_REPO: kejawa
-    IMAGE_NAME: my-frontend:latest
+    IMAGE_NAME: my-frontend
     NEXT_PUBLIC_API_URL: "http://217.76.61.226:3001/api"
 
 # -------------------------------------------------
@@ -48,7 +50,7 @@ jobs:
 
                     **Branch:** ${{ github.ref_name }}
 
-                    **Commit:** ${{ github.event.head_commit.message }}
+                    **Commit:** ${{ github.event.head_commit.message || github.sha }}
 
 
     # -------------------------------------------------
@@ -99,7 +101,7 @@ jobs:
             - name: Build Docker Image
               uses: docker/build-push-action@v5
               with:
-                context: .
+                context: ./devops-bootcamp-linker-frontend
                 load: true
                 tags: ${{ steps.tag.outputs.tags }}               
             
@@ -140,7 +142,7 @@ jobs:
             - name: Push Image to Docker Hub
               uses: docker/build-push-action@v5
               with:
-                context: .
+                context: ./devops-bootcamp-linker-frontend
                 push: true
                 tags: ${{ steps.tag.outputs.tags }}
                 build-args: |
